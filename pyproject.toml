@@ -18,6 +18,7 @@ dev = [
     "pylint==4.0.5",
     "pytest==9.0.3",
     "pre-commit==4.6.0",
+    "ruff==0.14.4",
 ]
 
 [project.scripts]
@@ -29,3 +30,37 @@ where = ["src"]
 [tool.pytest.ini_options]
 pythonpath = ["src", "scripts"]
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 80
+target-version = "py312"
+# scripts/dev/ is one-time-bootstrapped generic markdown tooling written in
+# standard 4-space PEP8 style -- not this repo's own Google-style convention
+# (see .pylintrc's ignore-paths for the same exemption on the pylint side).
+exclude = ["scripts/dev/"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors (line length etc., not superseded by a formatter here)
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort -- import grouping/ordering (Google style guide S3.13)
+    "B",    # flake8-bugbear
+    "UP",   # pyupgrade
+    "G",    # flake8-logging-format -- no f-strings in logger calls (Google style S3.10.1)
+    "TD",   # flake8-todos -- TODOs must carry a bug/issue reference (Google style S3.12)
+    "BLE",  # flake8-blind-except -- flag bare/overly-broad `except`
+    "S",    # flake8-bandit -- includes S101 (no `assert` outside tests/) and injection checks
+]
+# Deliberately no `ignore` list: unlike NiftyShield's config this repo does not silence
+# E501 (line length is enforced, not left to a formatter -- see the no-`ruff format`
+# note in this project's docs) and does not carry an ignore for `assert` in Pydantic-style
+# default args, since this project has no such usage today.
+
+[tool.ruff.lint.isort]
+known-first-party = ["athena_runner", "athena_mcp"]
+
+[tool.ruff.lint.per-file-ignores]
+# `assert` is the whole point of a test; only non-test code is held to G6.
+# S108: "/tmp/out" here is a placeholder path in fixtures, never actually written to.
+"tests/**/*.py" = ["S101", "S108"]

@@ -53,4 +53,18 @@ repo root before reviewing, since this profile summarizes but does not replace t
   where the diff shows unrelated files bundled together, or a commit message that isn't
   imperative-mood with a ≤60-char subject.
 
+## Google style guide checks ruff/pylint can't enforce (manual only)
+
+`ruff` and `pylint` already enforce most of this repo's Google Python Style Guide rules
+mechanically (line length, import order, blind-except, no bare `assert` outside tests, no
+f-string in logging calls — see `pyproject.toml`'s `[tool.ruff]`/`.pylintrc`). Don't
+re-report anything a linter already flags. Two rules have no linter equivalent and must be
+checked by eye:
+
+- **No `@staticmethod`** (style guide §2.17): a method that doesn't use `self` belongs as
+  a module-level function, not a `@staticmethod` — flag any new `@staticmethod`.
+- **No vertical alignment** (style guide §3.6): don't pad `=`, `:`, or trailing comments
+  with extra spaces to line up columns across consecutive lines — flag any new code that
+  does this (it causes noisy diffs when one line's identifier length changes).
+
 If nothing meets the bar, say so plainly instead of manufacturing findings to fill space.

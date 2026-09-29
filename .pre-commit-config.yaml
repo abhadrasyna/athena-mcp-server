@@ -23,6 +23,14 @@ repos:
         pass_filenames: false
         files: '\.py$'
 
+      - id: ruff
+        name: "ruff src/ scripts/ tests/ tooling/ (Google style guide subset, see pyproject.toml [tool.ruff])"
+        language: system
+        entry: ruff
+        args: ["check", "src", "scripts", "tests", "tooling"]
+        pass_filenames: false
+        files: '\.py$'
+
       - id: pytest
         name: "pytest (offline unit tests, no network/live AWS)"
         language: system
