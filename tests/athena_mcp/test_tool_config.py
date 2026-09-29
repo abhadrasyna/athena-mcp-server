@@ -52,7 +52,7 @@ def test_mount_external_subpackage_loads_directory_as_dotted_name(
   module = tool_config._mount_external_subpackage(dotted_name, package_dir)
 
   assert module.__name__ == dotted_name
-  assert getattr(sys.modules["athena_runner"], "_test_fake_pkg") is module
+  assert sys.modules["athena_runner"]._test_fake_pkg is module
 
   import importlib  # pylint: disable=import-outside-toplevel
   leaf = importlib.import_module(f"{dotted_name}.leaf")

@@ -44,7 +44,8 @@ import os
 import pathlib
 import sys
 import types
-from typing import Callable, Dict, List, Optional, Protocol
+from collections.abc import Callable
+from typing import Protocol
 
 from athena_runner import config as config_lib
 
@@ -72,10 +73,10 @@ class AthenaQueryProtocol(Protocol):
   def database(self) -> str:
     """The Athena database/catalog this query runs against."""
 
-  def build_sql(self, params: Dict[str, str]) -> str:
+  def build_sql(self, params: dict[str, str]) -> str:
     """Renders the final SQL statement to execute for `params`."""
 
-  def output_filename(self, params: Dict[str, str]) -> str:
+  def output_filename(self, params: dict[str, str]) -> str:
     """Returns the local CSV filename to save this query's result as."""
 
 
@@ -85,7 +86,7 @@ class QueryRegistryProtocol(Protocol):
   def get(self, name: str) -> AthenaQueryProtocol:
     """Returns the registered query named `name`."""
 
-  def names(self) -> List[str]:
+  def names(self) -> list[str]:
     """Returns all registered query names, sorted."""
 
 
@@ -112,7 +113,7 @@ class ProjectConfig:
 
   run_config: config_lib.RunConfig
   database: str
-  registry_loader: Optional[RegistryLoader] = None
+  registry_loader: RegistryLoader | None = None
 
 
 def _mount_external_subpackage(
@@ -164,7 +165,7 @@ def _load_mtn_registry() -> QueryRegistryProtocol:
   return registry_module.default_registry()
 
 
-PROJECT_CONFIGS: Dict[str, Optional[ProjectConfig]] = {
+PROJECT_CONFIGS: dict[str, ProjectConfig | None] = {
     "mtn": ProjectConfig(
         run_config=config_lib.RunConfig(
             profile="clarissa-insights-product",

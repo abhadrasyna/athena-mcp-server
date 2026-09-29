@@ -28,16 +28,17 @@ implemented against their own contract, instead of being force-fit into
 
 import dataclasses
 import os
-from typing import Any, Dict, List, Mapping, Optional
+from collections.abc import Mapping
+from typing import Any
 
-from athena_runner import aws_clients
-from athena_runner import cli_common
+from athena_mcp import result_preview, tool_config
+from athena_runner import (
+  aws_clients,
+  cli_common,
+  query_executor,
+  result_downloader,
+)
 from athena_runner import config as config_lib
-from athena_runner import query_executor
-from athena_runner import result_downloader
-
-from athena_mcp import result_preview
-from athena_mcp import tool_config
 
 _PREVIEW_MAX_ROWS = 20
 
@@ -84,7 +85,7 @@ class QueryRunResult:
 
 def _effective_run_config(
     project_config: tool_config.ProjectConfig,
-    overrides: Optional[Mapping[str, Any]]) -> config_lib.RunConfig:
+    overrides: Mapping[str, Any] | None) -> config_lib.RunConfig:
   """Applies caller `overrides` on top of `project_config.run_config`.
 
   Args:
@@ -118,7 +119,7 @@ def _ensure_sso(run_config: config_lib.RunConfig) -> None:
 
 def _execute_and_download(
     run_config: config_lib.RunConfig, sql: str, database: str,
-    output_filename: Optional[str] = None) -> QueryRunResult:
+    output_filename: str | None = None) -> QueryRunResult:
   """Runs `sql`, downloads its result, and builds a `QueryRunResult`.
 
   Args:
@@ -154,7 +155,7 @@ def _execute_and_download(
 
 
 def refresh_athena_sso(
-    project: str, overrides: Optional[Mapping[str, Any]] = None) -> bool:
+    project: str, overrides: Mapping[str, Any] | None = None) -> bool:
   """Pre-warms AWS SSO credentials for `project`'s profile.
 
   Args:
@@ -170,7 +171,7 @@ def refresh_athena_sso(
   return cli_common.ensure_valid_sso_credentials(run_config)
 
 
-def list_athena_queries(project: str) -> List[RegisteredQueryDescriptor]:
+def list_athena_queries(project: str) -> list[RegisteredQueryDescriptor]:
   """Lists `project`'s registered queries.
 
   Args:
@@ -200,8 +201,8 @@ def list_athena_queries(project: str) -> List[RegisteredQueryDescriptor]:
 
 
 def run_registered_athena_query(
-    project: str, name: str, params: Dict[str, str],
-    overrides: Optional[Mapping[str, Any]] = None) -> QueryRunResult:
+    project: str, name: str, params: dict[str, str],
+    overrides: Mapping[str, Any] | None = None) -> QueryRunResult:
   """Runs `project`'s registered query `name` with `params`.
 
   Args:
@@ -235,8 +236,8 @@ def run_registered_athena_query(
 
 
 def run_athena_sql(
-    project: str, sql: str, database: Optional[str] = None,
-    overrides: Optional[Mapping[str, Any]] = None) -> QueryRunResult:
+    project: str, sql: str, database: str | None = None,
+    overrides: Mapping[str, Any] | None = None) -> QueryRunResult:
   """Runs ad-hoc `sql` for `project`, with no mutation or filtering.
 
   Args:

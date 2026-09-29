@@ -25,13 +25,11 @@ import csv
 import logging
 import os
 import sys
-from typing import List, Optional
 
 import athena_cli_common
+
 from athena_runner import config as config_lib
-from athena_runner import logging_setup
-from athena_runner import query_executor
-from athena_runner import result_downloader
+from athena_runner import logging_setup, query_executor, result_downloader
 
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 _DEFAULT_OUTPUT_DIR = os.path.join(_SCRIPT_DIR, "..", "output")
@@ -42,7 +40,7 @@ _DEFAULT_TIMEOUT_SECONDS = 300
 _logger = logging.getLogger("athena_runner.discover_athena_tables")
 
 
-def _parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
+def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
   """Parses command-line arguments for the table-discovery CLI."""
   parser = argparse.ArgumentParser(
       description=__doc__,
@@ -81,14 +79,14 @@ def _parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
 def discover_tables(
     executor: query_executor.AthenaQueryExecutor,
     downloader: result_downloader.ResultDownloader,
-    database: str) -> List[str]:
+    database: str) -> list[str]:
   """Returns every table name in `database` via `SHOW TABLES`."""
   lines = athena_cli_common.run_and_read_lines(
       executor, downloader, f"SHOW TABLES IN {database}", database)
   return [line.strip() for line in lines if line.strip()]
 
 
-def write_tables_csv(tables: List[str], output_path: str) -> None:
+def write_tables_csv(tables: list[str], output_path: str) -> None:
   """Writes `tables` as a one-column (`table_name`) CSV to `output_path`."""
   os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
   with open(output_path, "w", newline="", encoding="utf-8") as handle:
@@ -98,7 +96,7 @@ def write_tables_csv(tables: List[str], output_path: str) -> None:
       writer.writerow([table])
 
 
-def main(argv: Optional[List[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
   """Discovers every table in `--database` and writes it to a CSV.
 
   Args:

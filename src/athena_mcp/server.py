@@ -16,7 +16,7 @@ rather than assumed.
 """
 
 import dataclasses
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from mcp.server.mcpserver import MCPServer
 
@@ -34,7 +34,7 @@ server = MCPServer(
 
 
 @server.tool()
-def list_athena_queries(project: str) -> List[Dict[str, str]]:
+def list_athena_queries(project: str) -> list[dict[str, str]]:
   """Lists `project`'s registered Athena queries.
 
   Args:
@@ -52,9 +52,9 @@ def list_athena_queries(project: str) -> List[Dict[str, str]]:
 def run_registered_athena_query(
     project: str,
     name: str,
-    params: Dict[str, str],
-    overrides: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
+    params: dict[str, str],
+    overrides: dict[str, Any] | None = None,
+) -> dict[str, Any]:
   """Runs `project`'s registered query `name` with `params`.
 
   Args:
@@ -79,9 +79,9 @@ def run_registered_athena_query(
 def run_athena_sql(
     project: str,
     sql: str,
-    database: Optional[str] = None,
-    overrides: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
+    database: str | None = None,
+    overrides: dict[str, Any] | None = None,
+) -> dict[str, Any]:
   """Runs ad-hoc `sql` for `project`, with no mutation or filtering.
 
   Args:
@@ -101,7 +101,7 @@ def run_athena_sql(
 
 @server.tool()
 def refresh_athena_sso(
-    project: str, overrides: Optional[Dict[str, Any]] = None) -> bool:
+    project: str, overrides: dict[str, Any] | None = None) -> bool:
   """Pre-warms AWS SSO credentials for `project`'s profile.
 
   Args:

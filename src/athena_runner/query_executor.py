@@ -3,7 +3,7 @@
 import abc
 import logging
 import time
-from typing import Any, Dict, NamedTuple
+from typing import Any, NamedTuple
 
 from athena_runner import config as config_lib
 from athena_runner import exceptions
@@ -85,7 +85,7 @@ class BotoAthenaQueryExecutor(AthenaQueryExecutor):
         query_execution_id, database, self._config.workgroup)
     return query_execution_id
 
-  def _poll_until_terminal(self, query_execution_id: str) -> Dict[str, Any]:
+  def _poll_until_terminal(self, query_execution_id: str) -> dict[str, Any]:
     """Polls Athena until the query is done, then returns its execution."""
     waited_seconds = 0
     while True:
@@ -107,7 +107,7 @@ class BotoAthenaQueryExecutor(AthenaQueryExecutor):
       waited_seconds += self._config.poll_interval_seconds
 
   def _raise_if_not_succeeded(self, query_execution_id: str,
-                               status: Dict[str, Any]) -> None:
+                               status: dict[str, Any]) -> None:
     if status["State"] != "SUCCEEDED":
       reason = status.get("StateChangeReason", "unknown reason")
       _logger.error(
@@ -117,7 +117,7 @@ class BotoAthenaQueryExecutor(AthenaQueryExecutor):
           f"Query {query_execution_id} ended in {status['State']}: {reason}")
 
   def _to_query_result(self, query_execution_id: str,
-                        execution: Dict[str, Any]) -> QueryResult:
+                        execution: dict[str, Any]) -> QueryResult:
     stats = execution.get("Statistics", {})
     _logger.info(
         "Query %s SUCCEEDED in %sms, scanned %s bytes", query_execution_id,

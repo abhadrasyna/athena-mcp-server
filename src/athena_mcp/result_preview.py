@@ -7,7 +7,6 @@ independently.
 
 import csv
 import dataclasses
-from typing import List
 
 
 @dataclasses.dataclass(frozen=True)
@@ -23,8 +22,8 @@ class ResultPreview:
     truncated: Whether the CSV has more data rows beyond this preview.
   """
 
-  columns: List[str]
-  rows: List[List[str]]
+  columns: list[str]
+  rows: list[list[str]]
   total_rows_previewed: int
   truncated: bool
 
@@ -49,7 +48,7 @@ def read_preview(csv_path: str, max_rows: int = 20) -> ResultPreview:
       columns = next(reader)
     except StopIteration as exc:
       raise ValueError(f"'{csv_path}' is empty -- no header row.") from exc
-    rows: List[List[str]] = []
+    rows: list[list[str]] = []
     truncated = False
     for row in reader:
       if len(rows) >= max_rows:

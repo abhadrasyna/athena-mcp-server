@@ -10,17 +10,18 @@ standard SSO pre-flight check.
 import logging
 import os
 import tempfile
-from typing import List, Tuple
 
-from athena_runner import aws_clients
-from athena_runner import cli_common
+from athena_runner import (
+  aws_clients,
+  cli_common,
+  exceptions,
+  query_executor,
+  result_downloader,
+)
 from athena_runner import config as config_lib
-from athena_runner import exceptions
-from athena_runner import query_executor
-from athena_runner import result_downloader
 
 
-def build_executor(run_config: config_lib.RunConfig) -> Tuple[
+def build_executor(run_config: config_lib.RunConfig) -> tuple[
     query_executor.AthenaQueryExecutor, result_downloader.ResultDownloader]:
   """Builds the Athena executor/downloader pair for `run_config`."""
   clients = aws_clients.AwsClientFactory(run_config.profile, run_config.region)
@@ -33,7 +34,7 @@ def build_executor(run_config: config_lib.RunConfig) -> Tuple[
 def run_and_read_lines(
     executor: query_executor.AthenaQueryExecutor,
     downloader: result_downloader.ResultDownloader,
-    sql: str, database: str) -> List[str]:
+    sql: str, database: str) -> list[str]:
   """Runs `sql`, downloads its result, and returns it as a list of lines.
 
   Athena's `SHOW TABLES` / `SHOW CREATE TABLE` results are plain text
@@ -46,7 +47,7 @@ def run_and_read_lines(
     tmp_path = tmp_file.name
   try:
     downloader.download(result.output_location, tmp_path)
-    with open(tmp_path, "r", encoding="utf-8") as handle:
+    with open(tmp_path, encoding="utf-8") as handle:
       return [line.rstrip("\n") for line in handle]
   finally:
     os.remove(tmp_path)

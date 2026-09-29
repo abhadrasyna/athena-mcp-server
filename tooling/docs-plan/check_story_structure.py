@@ -1,54 +1,73 @@
-"""Check ``docs/plan/`` story/epic folder structure. See ``docs/plan/README.md`` §Conventions.
+"""Check ``docs/plan/`` story/epic folder structure.
+
+See ``docs/plan/README.md`` §Conventions.
 
 Shapes enforced:
 
-* **Story folder** — ``prompt.md`` + ``tasks.md`` (or legacy ``*_tasks.md``) + ``stories.md``.
-* **Epic folder** — ``prompt.md`` (router) + ``README.md`` at the root, plus at least one
-  story sub-folder directly under it. The epic root carries no task file of its own.
+* **Story folder** — ``prompt.md`` + ``tasks.md`` (or legacy ``*_tasks.md``)
+  + ``stories.md``.
+* **Epic folder** — ``prompt.md`` (router) + ``README.md`` at the root, plus
+  at least one story sub-folder directly under it. The epic root carries no
+  task file of its own.
 
 Findings carry a level:
 
-* ``error`` — empty / stray folder, a folder that is neither a story nor an epic, a tracked
-  non-``.md`` file in a plan folder. Fails every mode.
-* ``warn``  — a missing ``stories.md`` / ``README.md`` / ``prompt.md``, a legacy
-  ``*_tasks.md`` name, ``CREATE``/``ALTER TABLE`` DDL with no sibling ``schema.md``, an extra
-  ``.md`` that holds task checkboxes.
+* ``error`` — empty / stray folder, a folder that is neither a story nor an
+  epic, a tracked non-``.md`` file in a plan folder. Fails every mode.
+* ``warn``  — a missing ``stories.md`` / ``README.md`` / ``prompt.md``, a
+  legacy ``*_tasks.md`` name, ``CREATE``/``ALTER TABLE`` DDL with no sibling
+  ``schema.md``, an extra ``.md`` that holds task checkboxes.
 
 Modes:
-    --all            audit every folder under docs/plan/; exits 1 only on ``error``
-                     findings — warnings pass. Add ``--strict`` to fail on any finding.
-    --staged         check folders added or modified in the current commit (pre-commit).
-                     Hard errors and ``strict`` warnings fail; other warnings still pass.
-    --staged-added   check only folders newly added in the current commit; exits 1 on any
-                     finding (warnings included).
-    <paths...>       check the folders those paths belong to (manual / tests); any finding
-                     exits 1
+    --all            audit every folder under docs/plan/; exits 1 only on
+                     ``error`` findings — warnings pass. Add ``--strict`` to
+                     fail on any finding.
+    --staged         check folders added or modified in the current commit
+                     (pre-commit). Hard errors and ``strict`` warnings fail;
+                     other warnings still pass.
+    --staged-added   check only folders newly added in the current commit;
+                     exits 1 on any finding (warnings included).
+    <paths...>       check the folders those paths belong to (manual /
+                     tests); any finding exits 1
 """
 
 from __future__ import annotations
 
 import re
+import shutil
 import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+_GIT = shutil.which("git") or "git"
+
 REQUIRED_PROMPT = "prompt.md"
 EXCLUDED = {"_TEMPLATE"}
 
-# Folder slugs still permitted to be non-canonical under `--staged` mode. Empty by
-# default in this generic template — add a project's own grandfathered slugs here.
+# Folder slugs still permitted to be non-canonical under `--staged` mode.
+# Empty by default in this generic template — add a project's own
+# grandfathered slugs here.
 _LEGACY_ALLOWLIST: set[str] = set()
 
-REPO_ROOT = Path(__file__).resolve().parents[2]  # tooling/docs-plan/ -> repo root
+REPO_ROOT = Path(__file__).resolve().parents[2]  # tooling/docs-plan/ -> root
 PLAN_DIR = REPO_ROOT / "docs" / "plan"
 
 DDL_RE = re.compile(r"\b(?:CREATE|ALTER)\s+TABLE\b", re.IGNORECASE)
 CHECKBOX_LINE_RE = re.compile(r"^\s*-\s*\[[ xX~]\]\s")
 
-# .md files that legitimately live in a story / epic folder (§Story-folder file set,
-# §Epic-folder file set, §Extra files). Anything else is an "extra .md".
-KNOWN_MD = {"prompt.md", "tasks.md", "stories.md", "schema.md", "README.md", "plan.md", "spec.md"}
+# .md files that legitimately live in a story / epic folder (§Story-folder
+# file set, §Epic-folder file set, §Extra files). Anything else is an
+# "extra .md".
+KNOWN_MD = {
+    "prompt.md",
+    "tasks.md",
+    "stories.md",
+    "schema.md",
+    "README.md",
+    "plan.md",
+    "spec.md",
+}
 
 
 @dataclass(frozen=True)
@@ -57,7 +76,7 @@ class Finding:
 
     level: str  # "error" | "warn"
     message: str
-    strict: bool = False  # a "warn" that --staged promotes to a failure off the allowlist
+    strict: bool = False  # a "warn" --staged promotes off the allowlist
 
 
 def _rel(path: Path) -> str:
@@ -74,7 +93,7 @@ def _has_task_file(folder: Path) -> bool:
 
 
 def _has_stories_file(folder: Path) -> bool:
-    """True if the folder carries ``stories.md`` or a legacy ``*_stories.md``."""
+    """True if the folder has ``stories.md`` or a legacy ``*_stories.md``."""
     return (folder / "stories.md").is_file() or any(folder.glob("*_stories.md"))
 
 
@@ -90,10 +109,12 @@ def is_story_folder(folder: Path) -> bool:
 
 def is_epic_folder(folder: Path, _depth: int = 0) -> bool:
     """A container folder whose sub-folders are stories (or nested epics)."""
-    if _depth >= 3:  # docs/plan/ is at most epic -> story deep; guard symlink cycles
+    if _depth >= 3:  # docs/plan/ is at most epic -> story deep; guard cycles
         return False
     subdirs = [p for p in _entries(folder) if p.is_dir()]
-    return any(is_story_folder(d) or is_epic_folder(d, _depth + 1) for d in subdirs)
+    return any(
+        is_story_folder(d) or is_epic_folder(d, _depth + 1) for d in subdirs
+    )
 
 
 def _story_subfolders(folder: Path) -> list[Path]:
@@ -108,12 +129,12 @@ def _text_of(folder: Path, name: str) -> str:
 
 
 def _is_legacy_named(name: str) -> bool:
-    """A legacy ``<slug>_tasks.md`` / ``<slug>_stories.md`` name (grandfathered)."""
+    """A legacy ``<slug>_tasks.md`` / ``<slug>_stories.md`` name."""
     return name.endswith("_tasks.md") or name.endswith("_stories.md")
 
 
 def _extra_file_findings(folder: Path) -> list[Finding]:
-    """No tracked non-``.md`` file, no extra ``.md`` with checkboxes (§Extra files)."""
+    """No non-``.md`` file, no extra ``.md`` with checkboxes (§Extra files)."""
     findings: list[Finding] = []
     for entry in _entries(folder):
         if entry.is_dir():
@@ -121,35 +142,43 @@ def _extra_file_findings(folder: Path) -> list[Finding]:
         name = entry.name
         if not (name.endswith(".md") or name.endswith(".md.example")):
             findings.append(
-                Finding("error", f"{_rel(entry)}: non-.md file in a plan folder — see §Extra files")
+                Finding(
+                    "error",
+                    f"{_rel(entry)}: non-.md file in a plan folder — "
+                    "see §Extra files",
+                )
             )
             continue
         if name in KNOWN_MD or _is_legacy_named(name):
             continue
-        if any(
-            CHECKBOX_LINE_RE.match(line) for line in entry.read_text(encoding="utf-8").splitlines()
-        ):
+        lines = entry.read_text(encoding="utf-8").splitlines()
+        if any(CHECKBOX_LINE_RE.match(line) for line in lines):
             findings.append(
                 Finding(
                     "warn",
-                    f"{_rel(entry)}: extra .md carries task checkboxes — move them to tasks.md "
-                    "(§Extra files)",
+                    f"{_rel(entry)}: extra .md carries task checkboxes — "
+                    "move them to tasks.md (§Extra files)",
                 )
             )
     return findings
 
 
 def _schema_backstop(folder: Path) -> list[Finding]:
-    """Warn when a folder's stories.md / prompt.md has DDL and no sibling schema.md."""
+    """Warn when a folder has DDL in stories.md/prompt.md and no schema.md."""
     if (folder / "schema.md").is_file():
         return []
-    blob = _text_of(folder, "stories.md") + "\n" + _text_of(folder, REQUIRED_PROMPT)
-    blob += "\n" + "\n".join(p.read_text(encoding="utf-8") for p in folder.glob("*_stories.md"))
+    blob = _text_of(folder, "stories.md") + "\n" + _text_of(
+        folder, REQUIRED_PROMPT
+    )
+    blob += "\n" + "\n".join(
+        p.read_text(encoding="utf-8") for p in folder.glob("*_stories.md")
+    )
     if DDL_RE.search(blob):
         return [
             Finding(
                 "warn",
-                f"{_rel(folder)}/: CREATE/ALTER TABLE in stories.md/prompt.md but no schema.md",
+                f"{_rel(folder)}/: CREATE/ALTER TABLE in stories.md/prompt.md "
+                "but no schema.md",
             )
         ]
     return []
@@ -162,7 +191,8 @@ def _check_story(folder: Path) -> list[Finding]:
         findings.append(
             Finding(
                 "warn",
-                f"{_rel(folder)}/: legacy '*_tasks.md' name — rename to tasks.md when next touched",
+                f"{_rel(folder)}/: legacy '*_tasks.md' name — rename to "
+                "tasks.md when next touched",
                 strict=True,
             )
         )
@@ -170,7 +200,8 @@ def _check_story(folder: Path) -> list[Finding]:
         findings.append(
             Finding(
                 "warn",
-                f"{_rel(folder)}/: missing stories.md — see §Story-folder file set",
+                f"{_rel(folder)}/: missing stories.md — see §Story-folder "
+                "file set",
                 strict=True,
             )
         )
@@ -187,7 +218,8 @@ def _check_epic(folder: Path) -> list[Finding]:
             findings.append(
                 Finding(
                     "warn",
-                    f"{_rel(folder)}/: epic root missing {name} — see §Epic-folder file set",
+                    f"{_rel(folder)}/: epic root missing {name} — see "
+                    "§Epic-folder file set",
                     strict=True,
                 )
             )
@@ -198,14 +230,15 @@ def _check_epic(folder: Path) -> list[Finding]:
 
 
 def check_folder(folder: Path) -> list[Finding]:
-    """Return one :class:`Finding` per problem with ``folder``; empty list if clean."""
+    """Return one :class:`Finding` per problem with ``folder``, or none."""
     if not folder.is_dir():
         return []
     if not _entries(folder):
         return [
             Finding(
                 "error",
-                f"{_rel(folder)}/: empty folder — remove it, or add {REQUIRED_PROMPT} + tasks.md + stories.md",
+                f"{_rel(folder)}/: empty folder — remove it, or add "
+                f"{REQUIRED_PROMPT} + tasks.md + stories.md",
             )
         ]
     if is_epic_folder(folder):
@@ -219,13 +252,15 @@ def check_folder(folder: Path) -> list[Finding]:
         missing.append("stories.md")
     return [
         Finding(
-            "error", f"{_rel(folder)}/: not a story or epic folder — missing {', '.join(missing)}"
+            "error",
+            f"{_rel(folder)}/: not a story or epic folder — missing "
+            f"{', '.join(missing)}",
         )
     ]
 
 
 def _folders_for_paths(paths: list[str]) -> list[Path]:
-    """Map file/dir paths to the distinct docs/plan/<slug>/ folders they live in."""
+    """Map file/dir paths to the distinct docs/plan/<slug>/ folders in them."""
     out: dict[str, Path] = {}
     for raw in paths:
         p = Path(raw)
@@ -248,9 +283,10 @@ def _all_folders() -> list[Path]:
 
 
 def _staged_added_folders() -> list[Path]:
-    """docs/plan/ folders that have a newly-added file staged in this commit."""
-    result = subprocess.run(
-        ["git", "diff", "--cached", "--diff-filter=A", "--name-only"],
+    """docs/plan/ folders with a newly-added file staged in this commit."""
+    # `_GIT` is resolved via `shutil.which` above, not caller-controlled input.
+    result = subprocess.run(  # noqa: S603
+        [_GIT, "diff", "--cached", "--diff-filter=A", "--name-only"],
         capture_output=True,
         text=True,
         cwd=REPO_ROOT,
@@ -260,9 +296,10 @@ def _staged_added_folders() -> list[Path]:
 
 
 def _staged_folders() -> list[Path]:
-    """docs/plan/ folders with any staged change in this commit (added or modified)."""
-    result = subprocess.run(
-        ["git", "diff", "--cached", "--name-only"],
+    """docs/plan/ folders with any staged change in this commit."""
+    # `_GIT` is resolved via `shutil.which` above, not caller-controlled input.
+    result = subprocess.run(  # noqa: S603
+        [_GIT, "diff", "--cached", "--name-only"],
         capture_output=True,
         text=True,
         cwd=REPO_ROOT,
@@ -272,7 +309,7 @@ def _staged_folders() -> list[Path]:
 
 
 def _print_and_count(folder: Path, findings: list[Finding]) -> bool:
-    """Print a folder's findings; return True if they should fail `--staged` mode."""
+    """Print a folder's findings; return True if they fail ``--staged`` mode."""
     allowlisted = folder.name in _LEGACY_ALLOWLIST
     fails = False
     for finding in findings:
@@ -286,7 +323,7 @@ def _print_and_count(folder: Path, findings: list[Finding]) -> bool:
 
 
 def main(argv: list[str]) -> int:
-    """Run the structure check; return 1 on failure (see module docstring for modes)."""
+    """Run the structure check; return 1 on failure (see module docstring)."""
     audit = "--all" in argv
     staged = "--staged" in argv
     if audit:
@@ -307,7 +344,10 @@ def main(argv: list[str]) -> int:
             if _print_and_count(folder, findings):
                 failed = True
         if total:
-            print(f"\n{total} story-folder issue(s). See docs/plan/README.md §Conventions.")
+            print(
+                f"\n{total} story-folder issue(s). "
+                "See docs/plan/README.md §Conventions."
+            )
         return 1 if failed else 0
 
     strict = "--strict" in argv

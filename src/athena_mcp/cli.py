@@ -21,12 +21,10 @@ top-level launcher script under `src/` or elsewhere, per the
 import argparse
 import dataclasses
 import pathlib
-from typing import Optional, Sequence
+from collections.abc import Sequence
 
+from athena_mcp import server, tool_config
 from athena_runner import logging_setup
-
-from athena_mcp import server
-from athena_mcp import tool_config
 
 # Mirrors `tool_config._REPO_ROOT`: `src/athena_mcp/cli.py` -> repo root.
 _REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -115,7 +113,7 @@ def _apply_server_defaults(
         project_config, run_config=new_run_config)
 
 
-def main(argv: Optional[Sequence[str]] = None) -> None:
+def main(argv: Sequence[str] | None = None) -> None:
   """Parses CLI args, configures logging, and starts the MCP server.
 
   Args:

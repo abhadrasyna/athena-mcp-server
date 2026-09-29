@@ -2,10 +2,8 @@
 
 import pytest
 
+from athena_mcp import query_tools, tool_config
 from athena_runner import config as config_lib
-
-from athena_mcp import query_tools
-from athena_mcp import tool_config
 
 
 class _FakeAthenaClient:

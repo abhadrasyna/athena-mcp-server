@@ -6,9 +6,7 @@ import pytest
 import run_table_ddl_export
 
 from athena_runner import config as config_lib
-from athena_runner import exceptions
-from athena_runner import query_executor
-from athena_runner import result_downloader
+from athena_runner import exceptions, query_executor, result_downloader
 
 
 def _run_config(**overrides):

@@ -14,9 +14,7 @@ import logging
 
 import pytest
 
-from athena_mcp import cli
-from athena_mcp import server
-from athena_mcp import tool_config
+from athena_mcp import cli, server, tool_config
 
 
 @pytest.fixture(autouse=True)

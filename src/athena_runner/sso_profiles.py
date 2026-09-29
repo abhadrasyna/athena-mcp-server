@@ -7,7 +7,6 @@ Athena query invocation. Add new profiles here as they're configured.
 """
 
 import dataclasses
-from typing import Dict
 
 
 @dataclasses.dataclass(frozen=True)
@@ -23,7 +22,7 @@ class SsoRoleMapping:
   exact_role: bool = True
 
 
-_PROFILE_ROLES: Dict[str, SsoRoleMapping] = {
+_PROFILE_ROLES: dict[str, SsoRoleMapping] = {
     "clarissa-insights-product": SsoRoleMapping(
         desired_role="arn:aws:iam::137353254249:role/readonly-synamedia",
         exact_role=True,

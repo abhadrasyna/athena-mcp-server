@@ -10,7 +10,6 @@ metric class hardcoding a literal default.
 """
 
 import dataclasses
-from typing import Dict, List
 
 
 @dataclasses.dataclass(frozen=True)
@@ -66,8 +65,8 @@ class TenantRegistry:
   """
 
   def __init__(self) -> None:
-    self._by_tenant_id: Dict[str, TenantConfig] = {}
-    self._by_code: Dict[str, TenantConfig] = {}
+    self._by_tenant_id: dict[str, TenantConfig] = {}
+    self._by_code: dict[str, TenantConfig] = {}
 
   def register(self, tenant: TenantConfig) -> None:
     """Adds `tenant` to the registry, keyed by its `tenant_id` and `code`."""
@@ -97,11 +96,11 @@ class TenantRegistry:
           f"Unknown tenant '{key}'. Available tenant ids: {available}"
       ) from exc
 
-  def tenant_ids(self) -> List[str]:
+  def tenant_ids(self) -> list[str]:
     """Returns all registered tenant ids, in registration order."""
     return list(self._by_tenant_id)
 
-  def all(self) -> List[TenantConfig]:
+  def all(self) -> list[TenantConfig]:
     """Returns all registered tenants, in registration order."""
     return list(self._by_tenant_id.values())
 

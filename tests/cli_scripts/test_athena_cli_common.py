@@ -5,11 +5,13 @@ import os
 
 import athena_cli_common
 
-from athena_runner import cli_common
+from athena_runner import (
+  cli_common,
+  exceptions,
+  query_executor,
+  result_downloader,
+)
 from athena_runner import config as config_lib
-from athena_runner import exceptions
-from athena_runner import query_executor
-from athena_runner import result_downloader
 
 
 def _run_config(**overrides):

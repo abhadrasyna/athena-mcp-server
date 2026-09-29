@@ -4,8 +4,7 @@ import csv
 
 import discover_athena_tables
 
-from athena_runner import query_executor
-from athena_runner import result_downloader
+from athena_runner import query_executor, result_downloader
 
 
 class _FakeExecutor(query_executor.AthenaQueryExecutor):

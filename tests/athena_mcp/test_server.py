@@ -15,9 +15,8 @@ import logging
 
 import pytest
 
-from athena_runner import logging_setup
-
 from athena_mcp import server
+from athena_runner import logging_setup
 
 
 def test_all_four_tools_are_registered():

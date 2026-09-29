@@ -1,23 +1,29 @@
-"""Check ``tasks.md`` checkbox-state consistency. See ``docs/plan/README.md`` §Conventions.
+"""Check ``tasks.md`` checkbox-state consistency.
 
-Convention: every task id carries exactly **one** checkbox — the one in the working list.
-A trailing ``## Epic done when`` / ``## Story done when`` block (if present) is a prose
-criteria list with no ``- [ ]`` / ``- [x]`` checkboxes, so nothing mirrors task state and
-nothing can drift.
+See ``docs/plan/README.md`` §Conventions.
 
-Checks, over every non-archived ``docs/plan/**/tasks.md`` (plus legacy ``*_tasks.md``):
+Convention: every task id carries exactly **one** checkbox — the one in the
+working list. A trailing ``## Epic done when`` / ``## Story done when`` block
+(if present) is a prose criteria list with no ``- [ ]`` / ``- [x]``
+checkboxes, so nothing mirrors task state and nothing can drift.
 
-1. no ``- [ ] **ID**`` / ``- [x] **ID**`` line inside a summary block (``## Epic done when``
-   / ``## Story done when`` / ``## Definition of done`` / ``## Done when`` / ``## Acceptance``);
-2. defensive — the same ``**ID**`` never appears with disagreeing checkbox state
-   anywhere in one file (catches a re-introduced mirror);
-3. cross-file — ``docs/plan/README.md`` ``next: **<id>**`` must not name an id that is
-   already ``- [x]`` in that story's ``tasks.md``;
-4. task-line tail — a working-list line that carries the optional ``| Review:`` field must
-   have a well-formed ``| Owner: … | Model: … | Review: … | SHA: …`` tail, with ``SHA`` a
-   placeholder (``—`` / ``<—>``) iff the box is unchecked, or a real 7–40 hex SHA (or the
-   ``<pending>`` interim, backfilled in the next commit) iff it is ticked. A line with no
-   such tail is skipped, not flagged — the tail format is opt-in per project.
+Checks, over every non-archived ``docs/plan/**/tasks.md`` (plus legacy
+``*_tasks.md``):
+
+1. no ``- [ ] **ID**`` / ``- [x] **ID**`` line inside a summary block
+   (``## Epic done when`` / ``## Story done when`` / ``## Definition of
+   done`` / ``## Done when`` / ``## Acceptance``);
+2. defensive — the same ``**ID**`` never appears with disagreeing checkbox
+   state anywhere in one file (catches a re-introduced mirror);
+3. cross-file — ``docs/plan/README.md`` ``next: **<id>**`` must not name an
+   id that is already ``- [x]`` in that story's ``tasks.md``;
+4. task-line tail — a working-list line that carries the optional
+   ``| Review:`` field must have a well-formed ``| Owner: … | Model: … |
+   Review: … | SHA: …`` tail, with ``SHA`` a placeholder (``—`` / ``<—>``)
+   iff the box is unchecked, or a real 7–40 hex SHA (or the ``<pending>``
+   interim, backfilled in the next commit) iff it is ticked. A line with no
+   such tail is skipped, not flagged — the tail format is opt-in per
+   project.
 
 Modes:
     --all         audit everything; exits 1 on any finding
@@ -32,20 +38,25 @@ import re
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[2]  # tooling/docs-plan/ -> repo root
+REPO_ROOT = Path(__file__).resolve().parents[2]  # tooling/docs-plan/ -> root
 PLAN_DIR = REPO_ROOT / "docs" / "plan"
 PLAN_README = PLAN_DIR / "README.md"
 EXCLUDED = {"_TEMPLATE"}
 
 HEADER_RE = re.compile(r"^(#+)\s+\S")
 SUMMARY_RE = re.compile(
-    r"^(#+)\s+(epic done when|story done when|definition of done|done when|acceptance)", re.I
+    r"^(#+)\s+(epic done when|story done when|definition of done"
+    r"|done when|acceptance)",
+    re.I,
 )
 CHECKBOX_RE = re.compile(r"^\s*-\s*\[([ xX~])\]\s*\*\*([^*]+?)\*\*")
-README_ENTRY_RE = re.compile(r"\*\*`([a-z0-9_-]+)/`\*\*.*?next:\s*\*\*([A-Za-z0-9._-]+)\*\*", re.I)
+README_ENTRY_RE = re.compile(
+    r"\*\*`([a-z0-9_-]+)/`\*\*.*?next:\s*\*\*([A-Za-z0-9._-]+)\*\*", re.I
+)
 
-# The canonical tail: `| Owner: X | Model: Y | Review: <token> | SHA: <w>` ending the line.
-# A legacy tail (`| Owner | Model | SHA` with no Review) does not match and is skipped.
+# The canonical tail: `| Owner: X | Model: Y | Review: <token> | SHA: <w>`
+# ending the line. A legacy tail (`| Owner | Model | SHA` with no Review)
+# does not match and is skipped.
 TAIL_RE = re.compile(
     r"\|\s*Owner:\s*[^|]+?\s*"
     r"\|\s*Model:\s*[^|]+?\s*"
@@ -66,33 +77,33 @@ def _rel(path: Path) -> str:
 
 
 def _norm_state(raw: str) -> str:
-    """Map a raw checkbox char to ``x`` (done), ``~`` (in progress) or ``' '`` (open)."""
+    """Map a checkbox char to ``x`` (done), ``~`` (in progress), or ``' '``."""
     low = raw.lower()
     return "x" if low == "x" else ("~" if low == "~" else " ")
 
 
-def _check_task_tail(path: Path, lineno: int, task_id: str, state: str, joined: str) -> list[str]:
-    """Validate the optional ``| Owner | Model | Review | SHA`` tail of one working-list line.
-
-    Only lines whose tail matches :data:`TAIL_RE` exactly are checked; a legacy tail with
-    no ``Review`` field, or no tail at all, is skipped.
-    """
+def _check_task_tail(
+    path: Path, lineno: int, task_id: str, state: str, joined: str
+) -> list[str]:
+    """Validate the ``| Owner | Model | Review | SHA`` tail of a task line."""
     match = TAIL_RE.search(joined)
     if match is None:
         return []
     findings: list[str] = []
     sha = match.group("sha").strip().strip("`")
     if state == "x" and sha == PENDING_SHA:
-        return findings  # interim: ticked, real SHA backfilled in the next commit
+        return findings  # interim: ticked, real SHA backfilled next commit
     if state == "x" and not SHA_RE.match(sha):
         findings.append(
-            f"{_rel(path)}:{lineno}: '{task_id}' is ticked but SHA is '{sha}' — set the real "
-            "commit SHA when ticking the box (§Task-line format)"
+            f"{_rel(path)}:{lineno}: '{task_id}' is ticked but SHA is "
+            f"'{sha}' — set the real commit SHA when ticking the box "
+            "(§Task-line format)"
         )
     if state != "x" and sha not in PLACEHOLDER_SHA:
         findings.append(
-            f"{_rel(path)}:{lineno}: '{task_id}' is unchecked but SHA is '{sha}' — an open "
-            "task's SHA must be the placeholder '—' (§Task-line format)"
+            f"{_rel(path)}:{lineno}: '{task_id}' is unchecked but SHA is "
+            f"'{sha}' — an open task's SHA must be the placeholder '—' "
+            "(§Task-line format)"
         )
     return findings
 
@@ -100,9 +111,10 @@ def _check_task_tail(path: Path, lineno: int, task_id: str, state: str, joined: 
 def _task_entries(lines: list[str]) -> list[tuple[int, str, str, str, bool]]:
     """Split ``lines`` into working-list entries.
 
-    Each entry is ``(lineno, task_id, state, joined_text, in_summary)`` where ``state`` is
-    ``x`` / ``~`` / ``' '`` and ``joined_text`` folds the checkbox line and its indented
-    continuation lines (up to the next blank line or checkbox) into one string.
+    Each entry is ``(lineno, task_id, state, joined_text, in_summary)`` where
+    ``state`` is ``x`` / ``~`` / ``' '`` and ``joined_text`` folds the checkbox
+    line and its indented continuation lines (up to the next blank line or
+    checkbox) into one string.
     """
     entries: list[tuple[int, str, str, str, bool]] = []
     in_summary = False
@@ -146,7 +158,7 @@ def _task_entries(lines: list[str]) -> list[tuple[int, str, str, str, bool]]:
 
 
 def check_file(path: Path) -> list[str]:
-    """Return one message per checkbox-consistency problem in ``path``; empty if clean."""
+    """Return one message per checkbox-consistency problem in ``path``."""
     lines = path.read_text(encoding="utf-8").splitlines()
     findings: list[str] = []
     id_states: dict[str, set[str]] = {}
@@ -155,8 +167,9 @@ def check_file(path: Path) -> list[str]:
     for lineno, task_id, state, joined, in_summary in _task_entries(lines):
         if in_summary:
             findings.append(
-                f"{_rel(path)}:{lineno}: '{task_id}' checkbox inside a summary block — "
-                "'## Story done when' / '## Epic done when' must be prose criteria, no `- [ ]`"
+                f"{_rel(path)}:{lineno}: '{task_id}' checkbox inside a summary "
+                "block — '## Story done when' / '## Epic done when' must be "
+                "prose criteria, no `- [ ]`"
             )
             continue
         id_states.setdefault(task_id, set()).add(state)
@@ -166,19 +179,20 @@ def check_file(path: Path) -> list[str]:
     for task_id, states in id_states.items():
         if len(states) > 1:
             findings.append(
-                f"{_rel(path)}:{id_line[task_id]}: '{task_id}' has disagreeing checkbox "
-                f"state across the file ({sorted(states)}) — one checkbox per id"
+                f"{_rel(path)}:{id_line[task_id]}: '{task_id}' has disagreeing "
+                f"checkbox state across the file ({sorted(states)}) — one "
+                "checkbox per id"
             )
     return findings
 
 
 def _resolve_pointer_task_file(slug: str, task_id: str) -> Path | None:
-    """Find the ``tasks.md`` that owns ``task_id`` for an epic/story ``slug`` row.
+    """Find the ``tasks.md`` owning ``task_id`` for an epic/story ``slug`` row.
 
-    A flat story's own ``<slug>/tasks.md`` is tried first. When that file is absent
-    (an epic row with no root ``tasks.md``, only nested sub-story folders), fall back to
-    searching every ``<slug>/**/tasks.md`` for the one that actually contains
-    ``**<task_id>**``.
+    A flat story's own ``<slug>/tasks.md`` is tried first. When that file is
+    absent (an epic row with no root ``tasks.md``, only nested sub-story
+    folders), fall back to searching every ``<slug>/**/tasks.md`` for the one
+    that actually contains ``**<task_id>**``.
     """
     flat = PLAN_DIR / slug / "tasks.md"
     if flat.is_file():
@@ -194,11 +208,13 @@ def _resolve_pointer_task_file(slug: str, task_id: str) -> Path | None:
 
 
 def check_readme_pointers() -> list[str]:
-    """Warn when ``docs/plan/README.md`` points a story's ``next:`` marker at a done id."""
+    """Warn when README's ``next:`` marker for a story points at a done id."""
     if not PLAN_README.is_file():
         return []
     findings: list[str] = []
-    for idx, line in enumerate(PLAN_README.read_text(encoding="utf-8").splitlines(), 1):
+    for idx, line in enumerate(
+        PLAN_README.read_text(encoding="utf-8").splitlines(), 1
+    ):
         match = README_ENTRY_RE.search(line)
         if not match:
             continue
@@ -208,10 +224,15 @@ def check_readme_pointers() -> list[str]:
             continue
         for raw in task_file.read_text(encoding="utf-8").splitlines():
             box = CHECKBOX_RE.match(raw)
-            if box and box.group(2).strip() == task_id and _norm_state(box.group(1)) == "x":
+            if (
+                box
+                and box.group(2).strip() == task_id
+                and _norm_state(box.group(1)) == "x"
+            ):
                 findings.append(
-                    f"docs/plan/README.md:{idx}: '{slug}/' next-marker points at '{task_id}' "
-                    f"which is already [x] in {_rel(task_file)}"
+                    f"docs/plan/README.md:{idx}: '{slug}/' next-marker points "
+                    f"at '{task_id}' which is already [x] in "
+                    f"{_rel(task_file)}"
                 )
                 break
     return findings
@@ -219,8 +240,12 @@ def check_readme_pointers() -> list[str]:
 
 def _task_files() -> list[Path]:
     """Every non-archived task file the audit covers."""
-    files = sorted(PLAN_DIR.glob("**/tasks.md")) + sorted(PLAN_DIR.glob("**/*_tasks.md"))
-    return [f for f in files if not set(f.relative_to(PLAN_DIR).parts) & EXCLUDED]
+    files = sorted(PLAN_DIR.glob("**/tasks.md")) + sorted(
+        PLAN_DIR.glob("**/*_tasks.md")
+    )
+    return [
+        f for f in files if not set(f.relative_to(PLAN_DIR).parts) & EXCLUDED
+    ]
 
 
 def _resolve_task_files(paths: list[str]) -> list[Path]:
@@ -243,7 +268,9 @@ def main(argv: list[str]) -> int:
     """Run the checkbox-consistency check; return 1 on any finding."""
     audit = "--all" in argv
     files = (
-        _task_files() if audit else _resolve_task_files([a for a in argv if not a.startswith("--")])
+        _task_files()
+        if audit
+        else _resolve_task_files([a for a in argv if not a.startswith("--")])
     )
 
     findings: list[str] = []

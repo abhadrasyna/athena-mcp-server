@@ -4,7 +4,6 @@ metrics, so the YYYY-MM-DD format check has a single implementation.
 
 import calendar
 import datetime
-from typing import Optional, Tuple
 
 
 def add_days(date: str, days: int) -> str:
@@ -46,7 +45,7 @@ def validate_iso_date(value: str, label: str) -> str:
   return value
 
 
-def month_bounds(month: str) -> Tuple[str, str]:
+def month_bounds(month: str) -> tuple[str, str]:
   """Returns the first and last YYYY-MM-DD dates of `month` (YYYY-MM).
 
   Args:
@@ -68,7 +67,7 @@ def month_bounds(month: str) -> Tuple[str, str]:
   return first_day, last_day
 
 
-def week_bounds(date: str) -> Tuple[str, str]:
+def week_bounds(date: str) -> tuple[str, str]:
   """Returns the ISO week's Monday and Sunday YYYY-MM-DD dates for `date`.
 
   Args:
@@ -91,12 +90,12 @@ def week_bounds(date: str) -> Tuple[str, str]:
 
 
 def resolve_date_range(
-    date: Optional[str] = None,
-    start_date: Optional[str] = None,
-    end_date: Optional[str] = None,
-    month: Optional[str] = None,
-    week: Optional[str] = None,
-) -> Tuple[str, str]:
+    date: str | None = None,
+    start_date: str | None = None,
+    end_date: str | None = None,
+    month: str | None = None,
+    week: str | None = None,
+) -> tuple[str, str]:
   """Resolves the `--date`/`--start-date`+`--end-date`/`--month`/`--week`
   CLI flags.
 

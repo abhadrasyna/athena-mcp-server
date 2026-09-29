@@ -1,6 +1,5 @@
 """Factory for boto3 clients that share one authenticated AWS SSO session."""
 
-from typing import Optional
 
 import boto3
 
@@ -14,7 +13,7 @@ class AwsClientFactory:
   this class's single responsibility.
   """
 
-  def __init__(self, profile: str, region: Optional[str] = None) -> None:
+  def __init__(self, profile: str, region: str | None = None) -> None:
     """Initializes the factory with a boto3 session for `profile`.
 
     Args:

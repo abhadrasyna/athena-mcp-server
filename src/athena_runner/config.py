@@ -1,7 +1,6 @@
 """Run configuration for a single Athena query execution."""
 
 import dataclasses
-from typing import Optional
 
 
 @dataclasses.dataclass(frozen=True)
@@ -25,7 +24,7 @@ class RunConfig:
   workgroup: str
   output_location: str
   output_dir: str
-  region: Optional[str] = None
+  region: str | None = None
   poll_interval_seconds: int = 2
   timeout_seconds: int = 300
   max_concurrency: int = 5

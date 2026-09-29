@@ -53,14 +53,17 @@ import dataclasses
 import logging
 import os
 import sys
-from typing import Iterator, List, Optional, Sequence
+from collections.abc import Iterator, Sequence
 
 import athena_cli_common
+
 from athena_runner import config as config_lib
-from athena_runner import exceptions
-from athena_runner import logging_setup
-from athena_runner import query_executor
-from athena_runner import result_downloader
+from athena_runner import (
+  exceptions,
+  logging_setup,
+  query_executor,
+  result_downloader,
+)
 
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 _DEFAULT_OUTPUT_DIR = os.path.join(_SCRIPT_DIR, "..", "output")
@@ -70,7 +73,7 @@ _DEFAULT_BATCH_SIZE = 10
 _logger = logging.getLogger("athena_runner.run_table_ddl_export")
 
 
-def _parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
+def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
   """Parses command-line arguments for the table-DDL exporter."""
   parser = argparse.ArgumentParser(
       description=__doc__,
@@ -132,7 +135,7 @@ def _parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
   return parser.parse_args(argv)
 
 
-def _read_tables_csv(csv_path: str) -> List[str]:
+def _read_tables_csv(csv_path: str) -> list[str]:
   """Reads a one-column `table_name` CSV, as written by
   `discover_athena_tables.py`.
   """
@@ -148,7 +151,7 @@ def _read_tables_csv(csv_path: str) -> List[str]:
 def discover_tables(
     executor: query_executor.AthenaQueryExecutor,
     downloader: result_downloader.ResultDownloader,
-    database: str) -> List[str]:
+    database: str) -> list[str]:
   """Returns every table name in `database` via `SHOW TABLES`."""
   lines = athena_cli_common.run_and_read_lines(
       executor, downloader, f"SHOW TABLES IN {database}", database)
@@ -165,7 +168,7 @@ def fetch_table_ddl(
   return "\n".join(lines)
 
 
-def _chunked(items: Sequence[str], batch_size: int) -> Iterator[List[str]]:
+def _chunked(items: Sequence[str], batch_size: int) -> Iterator[list[str]]:
   """Yields `items` split into consecutive lists of at most `batch_size`."""
   for start in range(0, len(items), batch_size):
     yield list(items[start:start + batch_size])
@@ -190,7 +193,7 @@ class ExportContext:
 
 
 def export_table_ddl(
-    context: ExportContext, tables: List[str], output_path: str,
+    context: ExportContext, tables: list[str], output_path: str,
     batch_size: int, skip_auth_check: bool) -> None:
   """Fetches DDL for every entry in `tables` and writes it to `output_path`.
 
@@ -236,7 +239,7 @@ def _reauth_or_raise(
 
 
 def _export_batch(
-    context: ExportContext, batch: List[str], writer, processed: int,
+    context: ExportContext, batch: list[str], writer, processed: int,
     total: int) -> int:
   """Fetches DDL for one batch of tables, writing each row as it goes.
 
@@ -259,7 +262,7 @@ def _export_batch(
   return processed
 
 
-def main(argv: Optional[List[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
   """Exports every requested table's DDL as a CSV.
 
   Args:

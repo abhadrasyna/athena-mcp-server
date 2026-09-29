@@ -5,9 +5,8 @@ Kept separate from either script (SRP/DRY) so the SSO pre-flight check
 only has one implementation to maintain.
 """
 
-from athena_runner import aws_clients
+from athena_runner import aws_clients, sso_auth
 from athena_runner import config as config_lib
-from athena_runner import sso_auth
 
 
 def ensure_valid_sso_credentials(run_config: config_lib.RunConfig) -> bool:

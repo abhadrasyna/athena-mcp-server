@@ -5,8 +5,7 @@ import subprocess
 import botocore.exceptions
 import pytest
 
-from athena_runner import exceptions
-from athena_runner import sso_auth
+from athena_runner import exceptions, sso_auth
 
 
 class _FakeStsClient:

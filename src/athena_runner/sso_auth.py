@@ -10,12 +10,12 @@ import functools
 import logging
 import shutil
 import subprocess
-from typing import Any, Callable, List
+from collections.abc import Callable
+from typing import Any
 
 import botocore.exceptions
 
-from athena_runner import exceptions
-from athena_runner import sso_profiles
+from athena_runner import exceptions, sso_profiles
 
 _logger = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ _AUTH_ERROR_CODES = frozenset({
     "AuthFailure",
 })
 
-CommandRunner = Callable[[List[str]], "subprocess.CompletedProcess[str]"]
+CommandRunner = Callable[[list[str]], "subprocess.CompletedProcess[str]"]
 PathFinder = Callable[[str], "str | None"]
 
 _DEFAULT_COMMAND_RUNNER: CommandRunner = functools.partial(
