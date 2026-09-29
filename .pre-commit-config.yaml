@@ -1,0 +1,36 @@
+repos:
+  - repo: local
+    hooks:
+      - id: md-line-length
+        name: "markdown lines must be <=200 chars"
+        language: system
+        entry: python scripts/dev/hooks/check_md_line_length.py
+        files: '\.md$'
+        pass_filenames: true
+
+      - id: md-reflow
+        name: "markdown must be in fill-to-<=200 style (reflow_md)"
+        language: system
+        entry: python scripts/dev/reflow_md.py --check
+        files: '\.md$'
+        pass_filenames: true
+
+      - id: pylint
+        name: "pylint src/ scripts/ (Google style guide, see .pylintrc)"
+        language: system
+        entry: pylint
+        args: ["src", "scripts"]
+        pass_filenames: false
+        files: '\.py$'
+
+      - id: pytest
+        name: "pytest (offline unit tests, no network/live AWS)"
+        language: system
+        entry: pytest
+        pass_filenames: false
+        files: '\.py$'
+
+# NOTE: mypy/bandit/detect-secrets hooks are deferred until this project
+# actually needs them -- src/, tests/, and pyproject.toml already ported
+# real content from oasis-athena-mcp, so pylint/pytest run for real here
+# (unlike the aspirational phase0 placeholder this note used to describe).

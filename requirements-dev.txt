@@ -1,0 +1,4 @@
+-r requirements.txt
+pylint==4.0.5
+pytest==9.0.3
+pre-commit==4.6.0

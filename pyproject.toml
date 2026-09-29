@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "athena-mcp-server"
+version = "0.1.0"
+description = "MCP server exposing Athena querying (registered reports + ad-hoc SQL) as tools, backed by a shared, project-agnostic Athena execution stack (AWS SSO auto-refresh, query executor, result downloader)."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "boto3==1.34.144",
+    "mcp==2.1.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pylint==4.0.5",
+    "pytest==9.0.3",
+    "pre-commit==4.6.0",
+]
+
+[project.scripts]
+athena-mcp-server = "athena_mcp.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "scripts"]
+testpaths = ["tests"]

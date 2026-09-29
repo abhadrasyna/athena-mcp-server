@@ -1,0 +1,40 @@
+# Pylint configuration for athena-mcp-server, tuned to the Google Python Style
+# Guide (https://google.github.io/styleguide/pyguide.html): 2-space indent,
+# 80-column lines, Google-style docstrings required on public modules/
+# classes/functions.
+
+[MASTER]
+ignore=CVS,__pycache__
+# scripts/dev/ is generic ih-project-scaffold-provided tooling (markdown
+# reflow/line-length checks), written in standard 4-space PEP8 style and
+# kept in sync with the scaffold source -- not this repo's authored
+# application code, so it's exempt from the 2-space convention below.
+ignore-paths=^scripts/dev/.*$
+
+[FORMAT]
+indent-string='  '
+indent-after-paren=4
+max-line-length=80
+
+[MESSAGES CONTROL]
+# Keep the checks that catch real SOLID/clean-code violations (unused
+# imports, too-few-public-methods on a "class" that's really a function,
+# duplicate code, etc.) and Google docstring conventions; disable the ones
+# that are noisy for a small CLI project or conflict with 2-space indent
+# tooling.
+disable=
+    too-few-public-methods,
+    duplicate-code,
+    fixme,
+    missing-module-docstring,
+    consider-using-f-string,
+
+[BASIC]
+# Google style: modules/functions/vars are snake_case, classes are
+# CapWords, constants are CAPS_WITH_UNDER. Pylint's defaults already match
+# this closely; no overrides needed beyond docstring requirements below.
+docstring-min-length=-1
+
+[DESIGN]
+max-args=8
+max-attributes=10
