@@ -11,7 +11,8 @@ Add a module-AGENTS.md index row here once the project has multiple modules each
 
 Add a DB_REGISTRY.md pointer here once the project writes to a database with more than one or two tables, or once "which table holds X" stops being obvious from the code. Not needed at Tier 0. -->
 
-<!-- INSERT: rule0 -->
+No module-level `AGENTS.md` files or `DB_REGISTRY.md` exist yet — this repo has a single flat module set (`athena_runner`, `athena_mcp`) and doesn't own/write application tables in Athena (it only
+queries existing tenant tables registered in `src/athena_runner/tenants.py`), so neither trigger has fired.
 
 ## Step 2 — Confirm scope
 
@@ -25,7 +26,8 @@ project idea. If code is confirmed wanted: confirm which files change, and tests
 Add a Step 2b council checkpoint here once a decision surfaces that is (1) load-bearing and costly to reverse, (2) has two defensible approaches with materially different outcomes, and (3) spans
 multiple disciplines at once — this can fire on day one for a high-stakes small project (e.g. tax-bracket logic), it is not gated on project size. Until then, skip straight to Step 3. -->
 
-<!-- INSERT: stakes -->
+No Step 2b council checkpoint has fired yet — no decision so far has been both load-bearing/hard-to-reverse and split across materially different approaches spanning multiple disciplines. The
+cross-repo `_load_mtn_registry` sibling-checkout mount (see `CONTEXT.md`'s Current Constraints) is the closest candidate to watch if it ever needs a structural alternative.
 
 ## Step 3 — State plan, wait for go-ahead
 
@@ -33,7 +35,7 @@ multiple disciplines at once — this can fire on day one for a high-stakes smal
 
 If the plan touches more than 2 files, wait for explicit go-ahead.
 
-<!-- INSERT: multi-surface -->
+No additional multi-surface checkpoint beyond the 2-file threshold is defined yet; Step 3's rule (wait for explicit go-ahead past 2 files) is the only gate currently in force.
 
 <!-- marker: tier1 -->
 ## Story/epic planning (`docs/plan/`)
@@ -41,13 +43,14 @@ If the plan touches more than 2 files, wait for explicit go-ahead.
 Work above a single-sitting fix is tracked as a story (one coherent goal) or epic (2+ related stories) under `docs/plan/<slug>/` — see `docs/plan/README.md` for the file-set conventions and
 `docs/plan/_TEMPLATE/README.md` for how to start one (`cp -r docs/plan/_TEMPLATE/story docs/plan/<slug>`). Structure and checkbox consistency are enforced at commit time by the
 `docs-plan-story-structure`/`docs-plan-checkbox-consistency` pre-commit hooks (see `tooling/docs-plan/`) — a malformed plan folder fails the commit, not a later review.
-<!-- INSERT: tier1 -->
+No further tier1-level overlay content beyond the story/epic conventions above is pending.
 
 ## Step 4 — Tests are mandatory
 
 Every public function needs one happy-path test + one error/edge-case test. No network in tests.
 
-<!-- INSERT: test-runner -->
+Run `make test` (wraps `pytest`) for the full suite, or `pytest tests/<path>` to target a module. `pytest tests/athena_mcp/test_tool_config.py` specifically re-verifies the cross-repo
+`aws-access-cli` query-registry mount noted in `CONTEXT.md` — run it after any change to either repo's `athena_runner` module set.
 
 ## Step 5 — Close the phase (docs → tests → commit)
 
@@ -55,9 +58,10 @@ A phase is not complete until all three are done.
 
 **5a — Update docs:** `CONTEXT.md` "What Exists" if new files were added.
 
-<!-- INSERT: state-freshness -->
+Also check `docs/table-ddl-knowledge-guide.md` and `docs/mcp-server-setup.md` for staleness whenever `PROJECT_CONFIGS`, tenant registrations, or the registered MCP tool list change.
 
-<!-- INSERT: md-organize -->
+New root-level `.md` files are reserved for protocol/status docs (`AGENTS.md`, `CONTEXT.md`, `README.md`, `PYTHON_DESIGN.md`, `suggestions.md`); everything else (setup guides, knowledge guides,
+story/epic tracking) goes under `docs/` or `docs/plan/`.
 
 **5b — Verify tests green** before committing.
 
@@ -67,7 +71,7 @@ A phase is not complete until all three are done.
 Add a mandatory code-reviewer subagent gate here once the project is large or high-stakes enough to warrant an isolated review pass before every commit (Tier 2). Until then, review the diff yourself
 before committing. -->
 
-<!-- INSERT: weekly-audit -->
+No recurring audit cadence is set up yet — revisit once the `session-close` skill's `suggestions.md` entries have accumulated enough history to review in aggregate rather than session-by-session.
 
 ## Python conventions
 
@@ -92,7 +96,7 @@ touches money or runs a long-lived concurrent service. -->
 - Every new package directory under `src/`, `scripts/`, or `tests/` needs an `__init__.py`, even a one-line comment. **Exception:** `src/athena_runner/` is deliberately a PEP 420 namespace package (no
   `__init__.py`) — see its module docstrings and `tool_config.py`'s registered-query-registry loading mechanism for why.
 - Design principles beyond the basics (SOLID as checkable triggers, named patterns): `PYTHON_DESIGN.md`, load on trigger only — not resident here.
-<!-- INSERT: python -->
+No further python-tier overlay content beyond the conventions above is pending.
 
 ## Domain conventions
 
