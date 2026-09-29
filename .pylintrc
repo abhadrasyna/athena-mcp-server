@@ -5,10 +5,11 @@
 
 [MASTER]
 ignore=CVS,__pycache__
-# scripts/dev/ is generic ih-project-scaffold-provided tooling (markdown
-# reflow/line-length checks), written in standard 4-space PEP8 style and
-# kept in sync with the scaffold source -- not this repo's authored
-# application code, so it's exempt from the 2-space convention below.
+# scripts/dev/ is generic markdown tooling (reflow/line-length checks) that
+# was one-time-bootstrapped from an external project scaffold at repo
+# creation -- there is no ongoing sync link to that source now, but it is
+# still written in standard 4-space PEP8 style rather than this repo's own
+# 2-space convention, so it stays exempt below.
 ignore-paths=^scripts/dev/.*$
 
 [FORMAT]
