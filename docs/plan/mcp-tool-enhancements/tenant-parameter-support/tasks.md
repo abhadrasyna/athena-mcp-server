@@ -5,9 +5,9 @@ a doc update). See `prompt.md` for why the story exists; see `stories.md` for th
 
 **Open: TENANT-1, TENANT-2, TENANT-3.**
 
-- [ ] **TENANT-1** — Confirm `aws-access-cli`'s tenant-plumbing contract (read-only investigation) | Owner: unassigned | Model: n/a | Review: none | SHA: —
-- [ ] **TENANT-2** — Add `tenant` parameter to `run_registered_athena_query`/`list_athena_queries` | Owner: unassigned | Model: n/a | Review: none | SHA: —
-- [ ] **TENANT-3** — Document the `tenant` parameter | Owner: unassigned | Model: n/a | Review: none | SHA: —
+- [ ] **TENANT-1** — Confirm `aws-access-cli`'s tenant-plumbing contract (read-only investigation) | Owner: unassigned | Model: claude-opus-5.5 | Review: none | SHA: —
+- [ ] **TENANT-2** — Add `tenant` parameter to `run_registered_athena_query`/`list_athena_queries` | Owner: unassigned | Model: claude-sonnet-5 | Review: none | SHA: —
+- [ ] **TENANT-3** — Document the `tenant` parameter | Owner: unassigned | Model: claude-haiku-4.5 | Review: none | SHA: —
 
 ## Story done when
 

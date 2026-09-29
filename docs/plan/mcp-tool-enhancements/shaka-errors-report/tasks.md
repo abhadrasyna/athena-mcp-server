@@ -5,9 +5,9 @@ implementation spec.
 
 **Open: SHAKA-1, SHAKA-2, SHAKA-3.**
 
-- [ ] **SHAKA-1** — Port `shaka_errors/` modules, reusing `adoption/` scaffolding where possible | Owner: unassigned | Model: n/a | Review: none | SHA: —
-- [ ] **SHAKA-2** — Add `run_shaka_errors_report` MCP tool | Owner: unassigned | Model: n/a | Review: none | SHA: —
-- [ ] **SHAKA-3** — Document `run_shaka_errors_report` | Owner: unassigned | Model: n/a | Review: none | SHA: —
+- [ ] **SHAKA-1** — Port `shaka_errors/` modules, reusing `adoption/` scaffolding where possible | Owner: unassigned | Model: claude-sonnet-5 | Review: none | SHA: —
+- [ ] **SHAKA-2** — Add `run_shaka_errors_report` MCP tool | Owner: unassigned | Model: claude-sonnet-5 | Review: none | SHA: —
+- [ ] **SHAKA-3** — Document `run_shaka_errors_report` | Owner: unassigned | Model: claude-haiku-4.5 | Review: none | SHA: —
 
 ## Story done when
 

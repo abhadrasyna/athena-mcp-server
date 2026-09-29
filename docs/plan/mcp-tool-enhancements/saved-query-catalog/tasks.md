@@ -5,9 +5,9 @@ exists; see `stories.md` for the per-task implementation spec.
 
 **Open: CATALOG-1, CATALOG-2, CATALOG-3.**
 
-- [ ] **CATALOG-1** — Confirm `QUERY_CATALOG.md`'s parseability / need for a structured sidecar | Owner: unassigned | Model: n/a | Review: none | SHA: —
-- [ ] **CATALOG-2** — Implement `list_saved_queries`/`describe_saved_query` | Owner: unassigned | Model: n/a | Review: none | SHA: —
-- [ ] **CATALOG-3** — Document the new tools, including the mtn/astro distinction | Owner: unassigned | Model: n/a | Review: none | SHA: —
+- [ ] **CATALOG-1** — Confirm `QUERY_CATALOG.md`'s parseability / need for a structured sidecar | Owner: unassigned | Model: claude-sonnet-5 | Review: none | SHA: —
+- [ ] **CATALOG-2** — Implement `list_saved_queries`/`describe_saved_query` | Owner: unassigned | Model: claude-sonnet-5 | Review: none | SHA: —
+- [ ] **CATALOG-3** — Document the new tools, including the mtn/astro distinction | Owner: unassigned | Model: claude-haiku-4.5 | Review: none | SHA: —
 
 ## Story done when
 

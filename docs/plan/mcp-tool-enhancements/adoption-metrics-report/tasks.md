@@ -5,9 +5,9 @@ implementation spec.
 
 **Open: ADOPT-1, ADOPT-2, ADOPT-3.**
 
-- [ ] **ADOPT-1** — Port `adoption/` modules into `src/athena_runner/adoption/` | Owner: unassigned | Model: n/a | Review: none | SHA: —
-- [ ] **ADOPT-2** — Add `run_adoption_report`/`list_adoption_metrics` MCP tools | Owner: unassigned | Model: n/a | Review: none | SHA: —
-- [ ] **ADOPT-3** — Document adoption-report tools | Owner: unassigned | Model: n/a | Review: none | SHA: —
+- [ ] **ADOPT-1** — Port `adoption/` modules into `src/athena_runner/adoption/` | Owner: unassigned | Model: claude-sonnet-5 | Review: none | SHA: —
+- [ ] **ADOPT-2** — Add `run_adoption_report`/`list_adoption_metrics` MCP tools | Owner: unassigned | Model: claude-sonnet-5 | Review: none | SHA: —
+- [ ] **ADOPT-3** — Document adoption-report tools | Owner: unassigned | Model: claude-haiku-4.5 | Review: none | SHA: —
 
 ## Story done when
 

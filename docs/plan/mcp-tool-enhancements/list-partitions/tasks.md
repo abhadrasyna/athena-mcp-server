@@ -5,9 +5,9 @@ exists; see `stories.md` for the per-task implementation spec.
 
 **Open: PART-1, PART-2, PART-3.**
 
-- [ ] **PART-1** — Confirm `SHOW PARTITIONS` vs. Glue `get_partitions` as the implementation mechanism | Owner: unassigned | Model: n/a | Review: none | SHA: —
-- [ ] **PART-2** — Implement `list_partitions` MCP tool | Owner: unassigned | Model: n/a | Review: none | SHA: —
-- [ ] **PART-3** — Document `list_partitions` | Owner: unassigned | Model: n/a | Review: none | SHA: —
+- [ ] **PART-1** — Confirm `SHOW PARTITIONS` vs. Glue `get_partitions` as the implementation mechanism | Owner: unassigned | Model: claude-opus-5.5 | Review: none | SHA: —
+- [ ] **PART-2** — Implement `list_partitions` MCP tool | Owner: unassigned | Model: claude-sonnet-5 | Review: none | SHA: —
+- [ ] **PART-3** — Document `list_partitions` | Owner: unassigned | Model: claude-haiku-4.5 | Review: none | SHA: —
 
 ## Story done when
 

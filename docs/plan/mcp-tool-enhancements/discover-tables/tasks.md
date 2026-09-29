@@ -5,10 +5,10 @@ per-task implementation spec.
 
 **Open: DISC-1, DISC-2, DISC-3, DISC-4.**
 
-- [ ] **DISC-1** — Separate `discover_athena_tables.py`'s table-listing logic from its argparse `main()` | Owner: unassigned | Model: n/a | Review: none | SHA: —
-- [ ] **DISC-2** — Add `discover_tables` MCP tool | Owner: unassigned | Model: n/a | Review: none | SHA: —
-- [ ] **DISC-3** — Add `describe_table` MCP tool | Owner: unassigned | Model: n/a | Review: none | SHA: —
-- [ ] **DISC-4** — Document both tools in `docs/mcp-server-setup.md` | Owner: unassigned | Model: n/a | Review: none | SHA: —
+- [ ] **DISC-1** — Separate `discover_athena_tables.py`'s table-listing logic from its argparse `main()` | Owner: unassigned | Model: claude-sonnet-5 | Review: none | SHA: —
+- [ ] **DISC-2** — Add `discover_tables` MCP tool | Owner: unassigned | Model: claude-sonnet-5 | Review: none | SHA: —
+- [ ] **DISC-3** — Add `describe_table` MCP tool | Owner: unassigned | Model: claude-sonnet-5 | Review: none | SHA: —
+- [ ] **DISC-4** — Document both tools in `docs/mcp-server-setup.md` | Owner: unassigned | Model: claude-haiku-4.5 | Review: none | SHA: —
 
 ## Story done when
 

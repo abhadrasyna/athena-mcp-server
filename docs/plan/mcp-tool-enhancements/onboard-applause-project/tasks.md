@@ -5,9 +5,9 @@ exists; see `stories.md` for the per-task implementation spec.
 
 **Open: APPLAUSE-1, APPLAUSE-2, APPLAUSE-3.**
 
-- [ ] **APPLAUSE-1** — Confirm debug-events table schema/partitioning and tenant scoping | Owner: unassigned | Model: n/a | Review: none | SHA: —
-- [ ] **APPLAUSE-2** — Register project and port the two query modes | Owner: unassigned | Model: n/a | Review: none | SHA: —
-- [ ] **APPLAUSE-3** — Document the new project/queries | Owner: unassigned | Model: n/a | Review: none | SHA: —
+- [ ] **APPLAUSE-1** — Confirm debug-events table schema/partitioning and tenant scoping | Owner: unassigned | Model: claude-opus-5.5 | Review: none | SHA: —
+- [ ] **APPLAUSE-2** — Register project and port the two query modes | Owner: unassigned | Model: claude-sonnet-5 | Review: none | SHA: —
+- [ ] **APPLAUSE-3** — Document the new project/queries | Owner: unassigned | Model: claude-haiku-4.5 | Review: none | SHA: —
 
 ## Story done when
 
